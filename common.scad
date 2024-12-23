@@ -1,5 +1,12 @@
 // This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License (http://creativecommons.org/licenses/by-sa/4.0/)
 
+module xmove(dist) { translate([dist, 0, 0]) children(); }
+module ymove(dist) { translate([0, dist, 0]) children(); }
+module zmove(dist) { translate([0, 0, dist]) children(); }
+module xrot(angle) { rotate([angle, 0, 0]) children(); }
+module yrot(angle) { rotate([0, angle, 0]) children(); }
+module zrot(angle) { rotate([0, 0, angle]) children(); }
+
 module round_cube(dimensions, radius, center=false) {
     if (center) {
         translate([0, 0, -0.5]) _round_cube(dimensions, radius, center);
@@ -16,6 +23,13 @@ module _round_cube(dimensions, radius, center=false) {
 }
 
 
+module hollow_cylinder_thick(height, outer_radius, thickness) {
+    difference() {
+        cylinder(h=height, r=outer_radius, center=true);
+        cylinder(h=height + 0.02, r=outer_radius - thickness, center=true);
+    }
+}
+
 module hollow_cylinder(height, externalDiameter, internalDiameter) {
     difference() {
         cylinder(height, r=externalDiameter/2);
@@ -31,6 +45,7 @@ module screw_hole(screwDiameter, headDiameter, depth, headDepth) {
 module cylinder_sector(diameter, startAngle, endAngle) {
     cylinder(h=height, d=diameter);
 }
+
 
 $fn=100;
 size=10;

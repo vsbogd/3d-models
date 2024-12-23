@@ -1,4 +1,4 @@
-use <lib/common.scad>;
+use <common.scad>;
 $fn=25;
 diameter = 23.5 + 0.5;
 

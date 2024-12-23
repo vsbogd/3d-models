@@ -1,4 +1,4 @@
-use <lib/common.scad>
+use <common.scad>
 
 platter_height = 2.2;
 platter_radius = 60;
