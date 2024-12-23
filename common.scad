@@ -8,6 +8,8 @@ module yrot(angle) { rotate([0, angle, 0]) children(); }
 module zrot(angle) { rotate([0, 0, angle]) children(); }
 
 module round_cube(dimensions, radius, center=false) {
+    assert(radius < dimensions[0]/2, "radius should be less than half of x length");
+    assert(radius < dimensions[1]/2, "radius should be less than half of y length")
     if (center) {
         translate([0, 0, -0.5]) _round_cube(dimensions, radius, center);
     } else {
@@ -17,23 +19,24 @@ module round_cube(dimensions, radius, center=false) {
 
 module _round_cube(dimensions, radius, center=false) {
         minkowski() {
-            cube([dimensions[0] - radius*2, dimensions[1] - radius*2, dimensions[2] - 1], center=center);
-            cylinder(r=radius,h=1);
+            cube([dimensions[0] - radius*2, dimensions[1] - radius*2, dimensions[2]], center=center);
+            cylinder(r=radius, h=0.01);
         }
 }
 
-
-module hollow_cylinder_thick(height, outer_radius, thickness) {
-    difference() {
-        cylinder(h=height, r=outer_radius, center=true);
-        cylinder(h=height + 0.02, r=outer_radius - thickness, center=true);
-    }
-}
 
 module hollow_cylinder(height, externalDiameter, internalDiameter) {
     difference() {
         cylinder(height, r=externalDiameter/2);
         translate([0, 0, -1]) cylinder(height + 2, r=internalDiameter/2);
+    }
+}
+
+// FIXME: merge hollow_cylinder and hollow_cylinder_thick: they are differently anchored
+module hollow_cylinder_thick(height, outerRadius, thickness, center=false) {
+    difference() {
+        cylinder(h=height, r=outerRadius, center=center);
+        cylinder(h=height + 0.02, r=outerRadius - thickness, center=center);
     }
 }
 
