@@ -1,14 +1,17 @@
 // This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License (http://creativecommons.org/licenses/by-sa/4.0/)
 
-use <common.scad>;
-
 width=20;
 height=50;
 thickness=3;
 firstScrewFromTop=7;
 distanceBetweenScrews=18;
 hookDiameter=20;
+
+module __customizer_limit__() {}
+
 $fn=100;
+
+use <common.scad>;
 
 module hook() {
     intersection() {
