@@ -1,28 +1,49 @@
 // This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License (http://creativecommons.org/licenses/by-sa/4.0/)
 
 width=10;
-height=16;
-thickness=6.4;
-wire_diameter=4;
+length=16;
+height=6.4;
+wireDiameter=4;
+screwDiameter = 4;
+screwHeadDiameter = 7;
+screwHeadHeight = 2;
 
 module __customizer_limit__() {}
 
+// Library functions
+
 use <common.scad>;
 
+// Model
+
 $fn=100;
-screw=(height-2-wire_diameter)/2;
+centerX=length/2;
+screwX=(length-2-wireDiameter)/2;
 
-rotate([0, -90, 0]) difference() {
-
-difference() {
-    translate([0, 0, -thickness]) rotate([90, 0, 90]) round_cube(dimensions=[height, thickness*2, width], radius=4);
-    translate([-1, -1, -thickness-1]) cube([width + 2, height + 2, thickness + 1]);
+module body() {
+    eps = 0.01;
+    difference() {
+        round_cube(dimensions=[length, height*2, width], radius=4, center=true);
+        translate([0, -(height + eps)/2, 0]) cube([length + 2*eps, height + eps, width + 2*eps], center=true);
+    }
 }
 
-translate([width/2, screw, 0]) screw_hole(screwDiameter=4, headDiameter=7, depth=thickness, headDepth=2);
-
-translate([-1, height-2-wire_diameter/2, wire_diameter/2]) rotate([90, 0, 90]) union() {
-        cylinder(d=wire_diameter, h=width + 2);
-        translate([-wire_diameter/2, -wire_diameter, 0]) cube([wire_diameter, wire_diameter, width + 2]);
+module wire() {
+    eps = 0.01;
+    rotate([0, 0, 180]) union() {
+        cylinder(d=wireDiameter, h=length + 2*eps, center=true);
+        center([wireDiameter, 0, length + 2*eps])
+            cube([wireDiameter, wireDiameter, length + 2*eps]);
     }
+}
+
+module screw() {
+    rotate([-90, 0, 0])
+        screw_hole(screwDiameter=screwDiameter, headDiameter=screwHeadDiameter, fullHeight=height, headHeight=screwHeadHeight);
+}
+
+difference() {
+    body();
+    translate([centerX - wireDiameter/2 - 2, wireDiameter/2, 0]) wire();
+    translate([-centerX + screwX, 0, 0]) screw();
 }

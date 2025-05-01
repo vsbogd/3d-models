@@ -6,56 +6,65 @@ module zmove(dist) { translate([0, 0, dist]) children(); }
 module xrot(angle) { rotate([angle, 0, 0]) children(); }
 module yrot(angle) { rotate([0, angle, 0]) children(); }
 module zrot(angle) { rotate([0, 0, angle]) children(); }
+module center(dims) { translate([-dims[0]/2, -dims[1]/2, -dims[2]/2]) children(); }
 
-module round_cube(dimensions, radius, center=false) {
-    assert(radius < dimensions[0]/2, "radius should be less than half of x length");
-    assert(radius < dimensions[1]/2, "radius should be less than half of y length")
+module _center_by_flag(dimensions, center) {
     if (center) {
-        translate([0, 0, -0.5]) _round_cube(dimensions, radius, center);
+        center(dimensions) children();
     } else {
-        translate([radius, radius, 0]) _round_cube(dimensions, radius);
+        children();
     }
 }
 
-module _round_cube(dimensions, radius, center=false) {
-        minkowski() {
-            cube([dimensions[0] - radius*2, dimensions[1] - radius*2, dimensions[2]], center=center);
-            cylinder(r=radius, h=0.01);
+module round_cube(dimensions, radius, center=false) {
+    width = dimensions[0];
+    depth = dimensions[1];
+    height = dimensions[2];
+    assert(radius < width/2, "radius should be less than half of x size");
+    assert(radius < depth/2, "radius should be less than half of y size")
+    _center_by_flag(dimensions, center)
+        translate([radius, radius, 0]) 
+            linear_extrude(height=height) 
+                minkowski() {
+                    square([width - radius*2, depth - radius*2]);
+                    circle(r=radius);
+                }
+}
+
+module hollow_cylinder(height, externalDiameter, internalDiameter, thickness, center=false) {
+    assert(internalDiameter != undef || thickness != undef, "either internalDiameter or thickness should be passed");
+    internalDiameter = internalDiameter == undef ? externalDiameter - 2*thickness : internalDiameter;
+    _center_by_flag([0, 0, height], center)
+        difference() {
+            cylinder(height, d=externalDiameter);
+            translate([0, 0, -1]) cylinder(height + 2, d=internalDiameter);
         }
 }
 
-
-module hollow_cylinder(height, externalDiameter, internalDiameter) {
-    difference() {
-        cylinder(height, r=externalDiameter/2);
-        translate([0, 0, -1]) cylinder(height + 2, r=internalDiameter/2);
+module screw_hole(screwDiameter, headDiameter, fullHeight, headHeight) {    
+    headZ = fullHeight - headHeight;
+    union() {
+        translate([0, 0, -0.01]) cylinder(h=fullHeight + 0.02, d=screwDiameter);
+        translate([0, 0, headZ]) cylinder(h=headHeight + 0.01, d=headDiameter);
     }
 }
 
-// FIXME: merge hollow_cylinder and hollow_cylinder_thick: they are differently anchored
-module hollow_cylinder_thick(height, outerRadius, thickness, center=false) {
-    difference() {
-        cylinder(h=height, r=outerRadius, center=center);
-        cylinder(h=height + 0.02, r=outerRadius - thickness, center=center);
-    }
-}
-
-module screw_hole(screwDiameter, headDiameter, depth, headDepth) {    
-    translate([0, 0, -depth]) cylinder(h=4 * depth, r=screwDiameter / 2);
-    translate([0, 0, depth - headDepth]) cylinder(h=4 * depth, r=headDiameter / 2);
-}
-
-module cylinder_sector(diameter, startAngle, endAngle) {
-    cylinder(h=height, d=diameter);
+module cylinder_sector(radius, height, startAngle, endAngle) {
+    assert(startAngle >= 0 && startAngle <= 360, "startAngle should be between 0 and 360");
+    assert(endAngle >= 0 && endAngle <= 360, "endAngle should be between 0 and 360");
+    a = endAngle - startAngle;
+    angle = a < 0 ? 360 + a : a;
+    echo ("angle = ", angle);
+    rotate([0, 0, startAngle]) rotate_extrude(angle=angle) square([radius, height]);
 }
 
 
 $fn=100;
-size=10;
-distance=0;
 
-round_cube(dimensions=[10,10,3], radius=3);
-!round_cube(dimensions=[10,10,3], radius=3, center=true);
-hollow_cylinder(height=3, externalDiameter=10, internalDiameter=7);
-difference() { cube([10, 10, 3]); translate([5, 5, 0]) screw_hole(screwDiameter=3, headDiameter=6, depth=3, headDepth=1); }
-cylinder_sector(height=3, diameter=10, startAngle=0, endAngle=180);
+//round_cube(dimensions=[10,10,3], radius=3);
+//round_cube(dimensions=[10,10,3], radius=3, center=true);
+//hollow_cylinder(height=3, externalDiameter=10, internalDiameter=7);
+//hollow_cylinder(height=3, externalDiameter=10, internalDiameter=7, center=true);
+//hollow_cylinder(height=3, externalDiameter=10, thickness = 1, center=true);
+difference() { cube([10, 10, 3]); translate([5, 5, 0]) screw_hole(screwDiameter=3, headDiameter=6, fullHeight=3, headHeight=1); }
+//cylinder_sector(height=3, radius=5, startAngle=60, endAngle=180);

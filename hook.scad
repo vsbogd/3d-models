@@ -21,7 +21,7 @@ module hook() {
 }
 
 module screw() {
-    screw_hole(screwDiameter=4, headDiameter=7, depth=thickness, headDepth=1);
+    screw_hole(screwDiameter=4, headDiameter=7, fullHeight=thickness, headHeight=1);
 }
 
 module rounding() {
