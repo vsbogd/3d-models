@@ -30,10 +30,10 @@ module body() {
 
 module wire() {
     eps = 0.01;
-    rotate([0, 0, 180]) union() {
-        cylinder(d=wireDiameter, h=length + 2*eps, center=true);
-        center([wireDiameter, 0, length + 2*eps])
-            cube([wireDiameter, wireDiameter, length + 2*eps]);
+    union() {
+        cylinder(d=wireDiameter, h=width + 2*eps, center=true);
+        translate([0, -wireDiameter/2, 0])
+            cube([wireDiameter, wireDiameter, width + 2*eps], center=true);
     }
 }
 
