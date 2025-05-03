@@ -15,7 +15,8 @@ groove_scale = groove_depth / groove_radius;
 groove_pos = diameter / 2;
 
 difference() {
+    eps = 0.01;
     cylinder(d=diameter, h=height, center=true);
     rotate_extrude() translate([groove_pos, 0, 0]) scale([groove_scale, 1]) circle(r = groove_radius);
-    translate([0, 0, 0]) cylinder(d=hole, h=height + 2, center=true);
+    cylinder(d=hole, h=height + 2*eps, center=true);
 }
