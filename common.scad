@@ -42,10 +42,11 @@ module hollow_cylinder(height, externalDiameter, internalDiameter, thickness, ce
 }
 
 module screw_hole(screwDiameter, headDiameter, fullHeight, headHeight) {    
+    eps = 1e-4;
     headZ = fullHeight - headHeight;
     union() {
-        translate([0, 0, -0.01]) cylinder(h=fullHeight + 0.02, d=screwDiameter);
-        translate([0, 0, headZ]) cylinder(h=headHeight + 0.01, d=headDiameter);
+        zmove(-eps) cylinder(h=fullHeight + 2*eps, d=screwDiameter);
+        zmove(headZ) cylinder(h=headHeight + eps, d=headDiameter);
     }
 }
 
