@@ -31,15 +31,7 @@ include <NopSCADlib/utils/core/core.scad> // get at https://github.com/nophead/N
 // common parameters
 
 $fn = 100;
-eps = 0.0001;
-
-// thread parameters
-
-pitch = 0;
-tooth_angle = 30;
-tolerance = 0.4;
-tip_height = 0;
-tooth_height = 2;
+eps = 1; // eps is big enough to cover imprecision in tooth_height
 
 // precalculations
 
@@ -49,6 +41,7 @@ echo("minimum screw body lenght: ", screw_body_length_min);
 thread_length = max_mirror_thickness + min_thread_length;
 base_height = distance_to_wall + thread_length;
 base_diameter = cap_diameter - 2 * cap_thickness;
+tooth_height = ThreadPitch(base_diameter); // tooth_height is used as a pitch exactly like the threads.scad do when tooth_height is omitted
 base_radius = base_diameter / 2;
 space_for_mirror = space_for_mirror_ratio * base_diameter;
 cut_for_support = tooth_height * no_support;
@@ -65,31 +58,28 @@ cap_depth = cap_thread_depth + cap_thickness;
 module base() {
     screw_hole(screw_diameter, screw_head_diameter, base_height, screw_head_height, [screw_hole_x, 0, 0])
         difference() {
-            union() {
-                cylinder(h = distance_to_wall, d = base_diameter);
-                zmove(distance_to_wall - eps)
-                    difference() {
-                        ScrewThread(base_diameter, thread_length + eps, pitch, tooth_angle, tolerance, tip_height, tooth_height, tip_min_fract=0);
-                        zmove(-eps) xmove(base_radius - space_for_mirror)
-                            ymove(-base_diameter * corner_ratio  + eps) ymove(base_radius)
-                                cube([space_for_mirror + eps, base_diameter + 2*eps, max_mirror_thickness + eps]);
-                    }
-            }
-            // tooth_height instead of eps here, because thread size is bigger than tooth_height
-            // and some artifacts are left if eps is used
-            xmove(-base_radius - tooth_height) zmove(-eps) ymove(-base_radius) cube([cut_for_support + tooth_height, base_diameter, base_height + 2*eps]);
+            RodStart(cap_diameter, distance_to_wall, thread_len=thread_length, thread_diam=base_diameter, thread_pitch=tooth_height);
+            zmove(distance_to_wall) 
+                xmove(base_radius - space_for_mirror)
+                    ymove(-base_diameter * corner_ratio  + eps) ymove(base_radius)
+                        cube([space_for_mirror + eps, base_diameter + 2*eps, max_mirror_thickness]);
+            xmove(-base_radius + cut_for_support) 
+                zmove(-eps) ymove(-base_radius) xmove(-base_radius-eps)
+                    cube([base_radius + eps, base_diameter, base_height + 2*eps]);
         }
 }
 
 module cap() {
-    ScrewHole(base_diameter, cap_thread_depth, [0,0,0], [0,0,0], pitch, tooth_angle, tolerance, tooth_height)
-        cylinder(h = cap_depth, d = cap_diameter);
+    RodEnd(cap_diameter, cap_depth, thread_len=cap_thread_depth, thread_diam=base_diameter, thread_pitch=tooth_height);
 }
 
-xmove(-base_radius - 5)
-    zmove(base_radius - cut_for_support) rotate([0, -90, 0]) base();
+xmove(-5)
+    zmove(base_radius - cut_for_support) rotate([0, -90, 0]) 
+        base();
 xmove(cap_diameter/2 + 5)
-    zmove(cap_depth) rotate([180, 0, 0]) cap();
+    cap();
+
+
 
 // common modules
 
