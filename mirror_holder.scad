@@ -1,6 +1,6 @@
 distance_to_wall = 2;           // distance between wall and back of the mirror
 min_mirror_thickness = 3;       // minimum thickness of the mirror
-max_mirror_thickness = 5;       // maximum thickness of the mirror
+max_mirror_thickness = 7;       // maximum thickness of the mirror
 min_thread_length = 5;          // minimum length of the thread to hold the cap
 cap_diameter = 30;              // diameter of the cap
 cap_thickness = 2;              // thickness of the cap's walls
