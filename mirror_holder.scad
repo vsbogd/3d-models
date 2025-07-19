@@ -25,12 +25,11 @@ assert(min_mirror_thickness < max_mirror_thickness);
 
 // required libraries
 
-use <rcolyer/threads.scad> // get at https://github.com/rcolyer/threads-scad/tree/master
-include <NopSCADlib/utils/core/core.scad> // get at https://github.com/nophead/NopSCADlib/tree/v21.40.0
+use <./mirror_holder/rcolyer/threads.scad> // get at https://github.com/rcolyer/threads-scad/tree/master
+include <./mirror_holder/NopSCADlib-21.40.0/utils/core/core.scad> // get at https://github.com/nophead/NopSCADlib/tree/v21.40.0
 
 // common parameters
 
-$fn = 100;
 eps = 1; // eps is big enough to cover imprecision in tooth_height
 
 // precalculations
@@ -73,14 +72,6 @@ module cap() {
     RodEnd(cap_diameter, cap_depth, thread_len=cap_thread_depth, thread_diam=base_diameter, thread_pitch=tooth_height);
 }
 
-xmove(-5)
-    zmove(base_radius - cut_for_support) rotate([0, -90, 0]) 
-        base();
-xmove(cap_diameter/2 + 5)
-    cap();
-
-
-
 // common modules
 
 module xmove(dist) { translate([dist, 0, 0]) children(); }
@@ -101,3 +92,11 @@ module screw_hole(screwDiameter, headDiameter, fullHeight, headHeight, position)
         }
     }
 }
+
+// mirror holder
+
+xmove(-5)
+    zmove(base_radius - cut_for_support) rotate([0, -90, 0])
+        base();
+xmove(cap_diameter/2 + 5)
+    cap();
