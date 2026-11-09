@@ -1,3 +1,6 @@
+// This work is licensed under a Creative Commons Attribution-ShareAlike 4.0
+// International License (http://creativecommons.org/licenses/by-sa/4.0/)
+
 $fn=50;
 thick = 0.6;
 marks = 0.2;
